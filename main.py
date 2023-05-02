@@ -2,17 +2,19 @@ import argparse
 from symectric import generator_sym_key, encrypt_sym, decrypt_sym
 from asymmetric import generation_asym_key, encrypt_asym, decrypt_asym
 from functions_bonus import load_settings, write_sym_key, load_sym_key, write_asym_key, load_private_key,  write_file, load_text
+
 SETTING_FILE = 'settings.json'
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-set', '--settings', type=str,
+    parser.add_argument('-set', '--settings', default=SETTING_FILE, type=str,
                         help='Позволяет использовать собственный json-файл с указанием путей''(Введите путь к файлу)')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-gen', '--generation', help='Запускает режим генерации ключей')
-    group.add_argument('-enc', '--encryption', help='Запускает режим шифрования')
-    group.add_argument('-dec', '--decryption', help='Запускает режим дешифрования')
+    group.add_argument('-gen', '--generation', action='store_true', help='Запускает режим генерации ключей')
+    group.add_argument('-enc', '--encryption', action='store_true', help='Запускает режим шифрования')
+    group.add_argument('-dec', '--decryption', action='store_true', help='Запускает режим дешифрования')
     args = parser.parse_args()
-    settings = load_settings(args.settings) if args.settings else load_settings(SETTING_FILE)
+    settings = load_settings(args.settings)
     if settings:
         if args.generation:
             sym_key = generator_sym_key()
@@ -34,4 +36,3 @@ if __name__ == '__main__':
             cipher_text = load_text(settings['encrypted_file'])
             text = decrypt_sym(symmetric_key, cipher_text)
             write_file(settings['decrypted_file'], text)
-

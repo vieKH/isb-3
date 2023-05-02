@@ -3,13 +3,17 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import logging
 
+logger = logging.getLogger()
+logger.setLevel('INFO')
+
+
 def generator_sym_key() -> bytes:
     """
     функция для генерации ключа
     :return: ключ симметричного алгоритма шифрования
     """
     key = os.urandom(16)
-
+    logging.info('Сгенерирован ключ для симметричного шифрования')
     return key
 
 
@@ -27,10 +31,11 @@ def encrypt_sym(key: bytes, text: bytes) -> bytes:
 
     encryptor = cipher.encryptor()
     c_text = encryptor.update(padded_text) + encryptor.finalize()
+    logging.info('Текст зашифрован алгоритмом симметричного шифрования SM4')
     return iv + c_text
 
 
-def decrypt_sym(key: bytes, cipher_text: bytes):
+def decrypt_sym(key: bytes, cipher_text: bytes) -> bytes:
     """
     Функция для расшифровать текст
     :param key: ключ
@@ -43,4 +48,5 @@ def decrypt_sym(key: bytes, cipher_text: bytes):
     dc_text = decryptor.update(cipher_text) + decryptor.finalize()
     unpadder = padding.ANSIX923(128).unpadder()
     unpadded_dc_text = unpadder.update(dc_text) + unpadder.finalize()
+    logging.info('Текст, зашифрованный алгоритмом симметричного шифрования SM4, расшифрован')
     return unpadded_dc_text
