@@ -1,4 +1,6 @@
 import argparse
+import logging
+
 from symectric import generator_sym_key, encrypt_sym, decrypt_sym
 from asymmetric import generation_asym_key, encrypt_asym, decrypt_asym
 from functions_bonus import load_settings, write_sym_key, load_sym_key, write_asym_key, load_private_key,  write_file, load_text
@@ -17,12 +19,14 @@ if __name__ == '__main__':
     settings = load_settings(args.settings)
     if settings:
         if args.generation:
+            logging.info('Режим генерации ключей начинается')
             sym_key = generator_sym_key()
-            public_key, private_key = generation_asym_key()
-            write_asym_key(public_key, private_key, settings['public_key'], settings['private_key'])
+            private_key, public_key = generation_asym_key()
+            write_asym_key(private_key, public_key, settings['private_key'], settings['public_key'])
             cipher_sym_key = encrypt_asym(public_key, sym_key)
             write_sym_key(cipher_sym_key, settings['symmetric_key'])
         elif args.encryption:
+            logging.info('Режим шифрования начинается')
             private_key = load_private_key(settings['private_key'])
             cipher_key = load_sym_key(settings['symmetric_key'])
             symectric_key = decrypt_asym(private_key, cipher_key)
@@ -30,6 +34,7 @@ if __name__ == '__main__':
             cipher_text = encrypt_sym(symectric_key, text)
             write_file(settings['encrypted_file'], cipher_text)
         else:
+            logging.info('Режим дешифрования начинается')
             private_key = load_private_key(settings['private_key'])
             cipher_key = load_sym_key(settings['symmetric_key'])
             symmetric_key = decrypt_asym(private_key, cipher_key)
